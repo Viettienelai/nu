@@ -122,6 +122,8 @@ canvas {
     top: 257px;
     left: 50%;
     transform: translate(-50%);
+    width: 400px;
+    text-align: center;
 }
 
 .loading-message {
