@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thư viện ảnh bảo mật</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <canvas id="matrix"></canvas>
+    <div class="password-overlay" id="passwordOverlay">
+        <div class="password-container">
+            <h1>Sanctum Matrix</h1>
+            <h2>The Axiom Core</h2>
+            <input type="password" class="password-input" id="passwordInput"
+                placeholder="Enter Prime Cipher Credentials . . .">
+
+            <button class="unlock-btn" id="unlockBtn">Breach</button>
+
+            <div id="unlockTarget">
+                <svg viewBox="-1.75 -0.6 18 18" class="cf-icon-svg">
+                    <path
+                        d="M9.464 17.178a4.5 4.5 0 0 1-2.013.317 4.3 4.3 0 0 1-2.007-.317.75.75 0 0 1-.277-.587c0-.22-.008-.798-.012-1.567-2.564.557-3.105-1.236-3.105-1.236a2.44 2.44 0 0 0-1.024-1.348c-.836-.572.063-.56.063-.56a1.94 1.94 0 0 1 1.412.95 1.96 1.96 0 0 0 2.682.765 1.97 1.97 0 0 1 .586-1.233c-2.046-.232-4.198-1.023-4.198-4.554a3.57 3.57 0 0 1 .948-2.474 3.3 3.3 0 0 1 .091-2.438s.773-.248 2.534.945a8.7 8.7 0 0 1 4.615 0c1.76-1.193 2.532-.945 2.532-.945a3.3 3.3 0 0 1 .092 2.438 3.56 3.56 0 0 1 .947 2.474c0 3.54-2.155 4.32-4.208 4.548a2.2 2.2 0 0 1 .625 1.706c0 1.232-.011 2.227-.011 2.529a.7.7 0 0 1-.272.587" />
+                </svg>
+
+            </div>
+
+            <div id="passwordMessage"></div>
+            <div class="progress-container" id="progressContainer" style="display: none;">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="progress-text" id="progressText"></div>
+        </div>
+    </div>
+
+    <div class="gallery-container" id="galleryContainer">
+        <div class="stats" id="statsDiv"></div>
+        <div id="contentContainer"></div>
+    </div>
+
+    <div class="modal" id="mediaModal">
+        <span class="close" id="closeModal">&times;</span>
+        <div class="nav-arrow nav-prev" id="navPrev">&#8249;</div>
+        <div class="nav-arrow nav-next" id="navNext">&#8250;</div>
+        <div class="nav-indicator" id="navIndicator"></div>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="" style="display: none;">
+            <video id="modalVideo" controls style="display: none;"></video>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/Draggable.min.js"></script>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

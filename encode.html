@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mã hóa/Giải mã File</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5; /* Nền nhẹ nhàng */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff; /* Nền trắng cho hộp nội dung */
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Đổ bóng nhẹ */
+            text-align: center;
+            max-width: 450px;
+            width: 90%; /* Tối ưu cho màn hình nhỏ */
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+        input[type="file"] {
+            display: block;
+            width: calc(100% - 20px); /* Đảm bảo đủ rộng */
+            padding: 10px;
+            margin: 15px auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fcfcfc;
+        }
+        button {
+            background-color: #007bff; /* Màu xanh dương chuẩn */
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 8px; /* Khoảng cách giữa các nút */
+            transition: background-color 0.2s ease; /* Hiệu ứng hover */
+        }
+        button:hover {
+            background-color: #0056b3; /* Màu xanh sẫm hơn khi hover */
+        }
+        #message {
+            margin-top: 20px;
+            color: #333;
+            font-weight: bold;
+            min-height: 20px; /* Đảm bảo không bị nhảy layout khi có/không có tin nhắn */
+        }
+        .note {
+            font-size: 0.85em;
+            color: #777;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mã hóa/Giải mã File</h1>
+        <input type="file" id="fileInput"><br>
+        <div class="note">Mật khẩu mặc định: `veoteoeoleo`</div>
+        <button id="encryptButton">Mã hóa</button>
+        <button id="decryptButton">Giải mã</button>
+        <div id="message"></div>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const encryptButton = document.getElementById('encryptButton');
+        const decryptButton = document.getElementById('decryptButton');
+        const messageDiv = document.getElementById('message');
+
+        const DEFAULT_PASSWORD = 'veoteoeoleo'; // Mật khẩu cố định theo yêu cầu
+
+        // Hàm tạo khóa từ mật khẩu (PBKDF2)
+        async function getKeyFromPassword(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await crypto.subtle.importKey("raw", enc.encode(password), { name: "PBKDF2" }, false, ["deriveBits", "deriveKey"]);
+            return crypto.subtle.deriveKey(
+                { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                true,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        // Hàm xử lý mã hóa
+        encryptButton.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) { messageDiv.textContent = 'Chọn file đã!'; return; }
+            messageDiv.textContent = 'Đang mã hóa...';
+
+            try {
+                const dataBuffer = await file.arrayBuffer(); // Đọc file dạng ArrayBuffer
+
+                const iv = crypto.getRandomValues(new Uint8Array(12)); // 12 bytes IV
+                const salt = crypto.getRandomValues(new Uint8Array(16)); // 16 bytes Salt
+
+                const key = await getKeyFromPassword(DEFAULT_PASSWORD, salt);
+
+                const encryptedBuffer = await crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, dataBuffer);
+
+                // Kết hợp Salt (16B), IV (12B), và dữ liệu mã hóa
+                // [Salt_len(1B)][IV_len(1B)][Salt][IV][Encrypted_Data]
+                const saltLengthByte = new Uint8Array([salt.byteLength]);
+                const ivLengthByte = new Uint8Array([iv.byteLength]);
+
+                const combinedBuffer = new Uint8Array(2 + salt.byteLength + iv.byteLength + encryptedBuffer.byteLength);
+                combinedBuffer.set(saltLengthByte, 0);
+                combinedBuffer.set(ivLengthByte, 1);
+                combinedBuffer.set(salt, 2);
+                combinedBuffer.set(iv, 2 + salt.byteLength);
+                combinedBuffer.set(new Uint8Array(encryptedBuffer), 2 + salt.byteLength + iv.byteLength);
+
+                const originalFileName = file.name;
+                const blob = new Blob([combinedBuffer], { type: 'application/octet-stream' });
+                const downloadUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = originalFileName + '.enc';
+                a.click();
+                URL.revokeObjectURL(downloadUrl);
+
+                messageDiv.textContent = 'Mã hóa thành công! File đã tải xuống.';
+            } catch (error) {
+                messageDiv.textContent = `Lỗi mã hóa: ${error.message}`;
+                console.error('Encrypt error:', error);
+            }
+        });
+
+        // Hàm xử lý giải mã
+        decryptButton.addEventListener('click', async () => {
+            const file = fileInput.files[0];
+            if (!file) { messageDiv.textContent = 'Chọn file đã!'; return; }
+            messageDiv.textContent = 'Đang giải mã...';
+
+            try {
+                const dataBuffer = await file.arrayBuffer(); // Đọc file đã mã hóa
+                const dataBytes = new Uint8Array(dataBuffer);
+
+                // Trích xuất Salt và IV từ đầu file
+                const saltLength = dataBytes[0];
+                const ivLength = dataBytes[1];
+                const salt = dataBytes.slice(2, 2 + saltLength);
+                const iv = dataBytes.slice(2 + saltLength, 2 + saltLength + ivLength);
+                const encryptedData = dataBytes.slice(2 + saltLength + ivLength); // Dữ liệu đã mã hóa
+
+                const key = await getKeyFromPassword(DEFAULT_PASSWORD, salt);
+
+                const decryptedBuffer = await crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    encryptedData.buffer
+                );
+
+                let originalFileName = file.name;
+                if (originalFileName.endsWith('.enc')) {
+                    originalFileName = originalFileName.slice(0, -4);
+                } else {
+                    originalFileName = "decrypted_file";
+                }
+
+                const blob = new Blob([decryptedBuffer], { type: 'application/octet-stream' });
+                const downloadUrl = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = originalFileName;
+                a.click();
+                URL.revokeObjectURL(downloadUrl);
+
+                messageDiv.textContent = 'Giải mã thành công! File đã tải xuống.';
+            } catch (error) {
+                messageDiv.textContent = `Lỗi giải mã: ${error.message}. Sai mật khẩu hoặc file hỏng?`;
+                console.error('Decrypt error:', error);
+            }
+        });
+    </script>
+</body>
+</html>
