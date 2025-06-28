@@ -5,7 +5,6 @@
 }
 
 body {
-    font-family: 'Courier New', monospace;
     background-color: #111;
     color: white;
     display: flex;
@@ -37,111 +36,195 @@ canvas {
 
 .password-container {
     position: absolute;
-    background: #222;
-    border-radius: 24px;
-    box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-    width: 400px;
-    height: 350px;
-    border: 1px solid #333;
+    width: 450px;
+    height: 400px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    background: rgb(0, 20, 40);
+    border: 2px solid #00aaff;
+    border-radius: 14px;
+    box-shadow:
+        0 0 50px rgba(0, 170, 255, 0.5),
+        inset 0 0 50px rgba(0, 170, 255, 0.3);
+    font-family: 'Courier New', monospace;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.h1 {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
 }
 
 .password-container h1 {
-    color: white;
-    font-size: 2.5em;
-    position: absolute;
-    top: 15px;
-    left: 50%;
-    transform: translate(-50%);
-    text-align: center;
-    width: 400px;
+    color: #00aaff;
+    font-size: 35px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00aaff;
+    letter-spacing: 3px;
 }
 
-.password-container h2 {
-    color: rgb(220, 220, 220);
-    font-size: 1.4em;
+.typing-cursor {
+    color: #00aaff;
+    font-size: 25px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #00aaff;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    50% {
+        opacity: 1;
+    }
+
+    51%,
+    100% {
+        opacity: 0;
+    }
+}
+
+.h2 {
+    color: #00ff88;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+
+.h2 span {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(0.7);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.credential {
+    position: relative;
+    width: 85%;
+    height: 50px;
+    box-sizing: border-box;
+}
+
+.credential p {
     position: absolute;
-    top: 70px;
-    left: 50%;
-    transform: translate(-50%);
-    text-align: center;
-    width: 400px;
+    pointer-events: none;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: monospace;
+    background: rgb(0, 20, 40);
+    padding: 0 10px;
+    z-index: 1;
+    transition: all 0.3s ease-out;
+}
+
+.password-input:focus+p {
+    top: -10px;
+    left: 20px;
+    font-size: 15px;
+    color: #00aaff;
+}
+
+.password-input:not(:focus)+p {
+    top: 12px;
+    left: 20px;
+    font-size: 20px;
+    color: #007bb9;
 }
 
 .password-input {
-    position: absolute;
-    top: 120px;
-    left: 50%;
-    transform: translate(-50%);
-    width: 330px;
-    /* 100% của 400px - 2*30px padding đã loại bỏ */
-    height: 50px;
-    /* Đặt chiều cao thủ công thay vì padding */
-    border: 2px solid #444;
+    position: relative;
+    pointer-events: auto;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgb(0, 20, 40);
     border-radius: 14px;
     font-size: 1.1em;
-    background: #333;
     color: white;
     padding-left: 20px;
+    border: 2px solid #007bb9;
 }
 
 .password-input:focus {
     outline: none;
     border-color: #666;
+    border: 2px solid #00aaff;
 }
 
 .unlock-btn {
-    position: absolute;
-    height: 50px;
-    top: 190px;
-    left: 50%;
-    transform: translate(-50%);
-    background: #333;
+    background: #00aaffba;
     color: white;
-    width: 200px;
-    /* Đặt chiều rộng thủ công */
+    width: 85%;
     height: 50px;
-    /* Đặt chiều cao thủ công */
     border: none;
-    border-radius: 50px;
-    font-size: 1.1em;
+    border-radius: 14px;
+    font-size: 1.5em;
+    font-weight: 600;
+    font-family: 'Courier New', monospace;
     cursor: pointer;
 }
 
 .unlock-btn:hover {
-    background: #444;
+    background: #00aaff;
+    box-shadow:
+        0 0 50px rgba(0, 170, 255, 0.5),
+        inset 0 0 50px rgba(0, 170, 255, 0.3);
 }
 
 .error-message {
     color: #ff6b6b;
     font-size: 1.2rem;
     font-weight: bold;
-    position: absolute;
-    top: 257px;
-    left: 50%;
-    transform: translate(-50%);
     width: 400px;
     text-align: center;
 }
 
 .loading-message {
-    color: #4ecdc4;
+    color: #00ff88;
     font-size: 1.2rem;
     font-weight: bold;
-    position: absolute;
-    top: 257px;
-    left: 50%;
-    transform: translate(-50%);
     width: 400px;
     text-align: center;
 }
 
+.progress-layout {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
 .progress-container {
     position: absolute;
-    left: 50%;
-    transform: translate(-50%);
     bottom: 0;
     width: 100%;
     background: #333;
@@ -152,17 +235,14 @@ canvas {
 
 .progress-bar {
     height: 100%;
-    background: #4ecdc4;
+    background: #00ff88;
     width: 0%;
 }
 
 .progress-text {
+    height: 20px;
     font-size: 0.9em;
     color: #aaa;
-    position: absolute;
-    top: 300px;
-    left: 50%;
-    transform: translate(-50%);
 }
 
 /* Gallery styles */

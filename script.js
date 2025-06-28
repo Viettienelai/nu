@@ -519,7 +519,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 // Các ký tự sẽ rơi xuống
-const characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!@#$%^&*()_+-=[]{}|;:,.<>?';
+const characters = '`1234567890-=!@#$%^&*()_+qwertyuiop[]\QWERTYUIOP{}|asdfghjklASDFGHJKL:"zxcvbnm,./ZXCVBNM<>?';
 const charactersArray = characters.split('');
 
 // Mảng chứa các cột

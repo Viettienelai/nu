@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thư viện ảnh bảo mật</title>
+    <title>Sanctum Matrix</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -12,11 +12,19 @@
     <canvas id="matrix"></canvas>
     <div class="password-overlay" id="passwordOverlay">
         <div class="password-container">
-            <h1>Sanctum Matrix</h1>
-            <h2>The Axiom Core</h2>
-            <input type="password" class="password-input" id="passwordInput"
-                placeholder="Enter Prime Cipher Credentials . . .">
-
+            <div class="header">
+                <div class="h1">
+                    <h1>Sanctum Matrix</h1>
+                    <div class="typing-cursor">_</div>
+                </div>
+                <div class="h2">
+                    <span>●</span> THE AXIOM CORE
+                </div>
+            </div>
+            <div class="credential">
+                <input type="password" class="password-input" id="passwordInput">
+                <p>Prime Cipher Credential</p>
+            </div>
             <button class="unlock-btn" id="unlockBtn">Breach</button>
 
             <div id="unlockTarget">
@@ -28,8 +36,10 @@
             </div>
 
             <div id="passwordMessage"></div>
-            <div class="progress-container" id="progressContainer" style="display: none;">
-                <div class="progress-bar" id="progressBar"></div>
+            <div class="progress-layout">
+                <div class="progress-container" id="progressContainer" style="display: none;">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
             </div>
             <div class="progress-text" id="progressText"></div>
         </div>
