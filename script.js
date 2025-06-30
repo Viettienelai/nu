@@ -29,6 +29,10 @@ let currentModalElement = null;
 let currentMediaIndex = -1;
 let preloadedData = null; // Lưu trữ data đã được giải mã
 
+// === BIẾN TRẠNG THÁI MỚI ===
+let isDecryptionComplete = false;
+let isPendingUnlock = false;
+
 // CUSTOM LAYOUT CONFIGURATION
 const layoutConfig = {
     1: {
@@ -135,6 +139,9 @@ async function preloadAndDecryptMedia() {
     passwordMessage.innerHTML = '<div class="loading-message">Initializing Protocol . . .</div>';
     progressContainer.style.display = 'block';
 
+    // === KÍCH HOẠT DRAG & DROP NGAY LẬP TỨC ===
+    setupDragAndDropUnlock();
+
     for (let i = 1; i <= MAX_FILE_NUMBER; i++) {
         const extensions = ['avif.enc', 'mp4.enc', 'webp.enc', 'jpg.enc', 'png.enc', 'webm.enc'];
         const filePromise = (async () => {
@@ -177,8 +184,15 @@ async function preloadAndDecryptMedia() {
     const media = results.filter(item => item !== null);
     media.sort((a, b) => a.id - b.id);
 
-    progressContainer.style.display = 'none';
     passwordMessage.innerHTML = '<div class="loading-message">Validated</div>';
+    
+    // === ĐÁNH DẤU GIẢI MÃ HOÀN THÀNH ===
+    isDecryptionComplete = true;
+    
+    // === NẾU ĐANG CHỜ UNLOCK THÌ THỰC HIỆN NGAY ===
+    if (isPendingUnlock) {
+        await executeUnlock({ media, successCount: media.length });
+    }
 
     return { media, successCount: media.length };
 }
@@ -215,29 +229,21 @@ async function createMediaUrlsAndWaitForLoad(media) {
     return mediaWithUrls;
 }
 
-// === TÁCH LOGIC MỞ KHÓA RA HÀM RIÊNG ===
-// Hàm này sẽ được gọi khi mở khóa thành công (bằng pass hoặc kéo thả)
-async function initiateUnlock() {
-    if (!preloadedData) {
-        passwordMessage.innerHTML = '<div class="error-message">Dữ liệu chưa sẵn sàng!</div>';
-        return;
-    }
-
-    // Vô hiệu hóa các nút và input
+// === TÁCH PHẦN THỰC THI UNLOCK RA HÀM RIÊNG ===
+async function executeUnlock(data) {
     passwordInput.disabled = true;
-
     passwordMessage.innerHTML = '<div class="loading-message">Orchestrating Digital Canvas . . .</div>';
     progressContainer.style.display = 'block';
-    updateProgress(0, preloadedData.media.length, 'Preparing . . .');
+    updateProgress(0, data.media.length, 'Preparing . . .');
 
     try {
-        decryptedMedia = await createMediaUrlsAndWaitForLoad(preloadedData.media);
-        updateProgress(preloadedData.media.length, preloadedData.media.length, 'Terminated');
+        decryptedMedia = await createMediaUrlsAndWaitForLoad(data.media);
+        updateProgress(data.media.length, data.media.length, 'Terminated');
 
         setTimeout(() => {
             passwordOverlay.style.display = 'none';
             galleryContainer.style.display = 'block';
-            statsDiv.textContent = `Đã tải thành công ${preloadedData.successCount} media`;
+            statsDiv.textContent = `Đã tải thành công ${data.successCount} media`;
             createGalleryStructure(decryptedMedia);
             setTimeout(() => {
                 galleryContainer.classList.add('show');
@@ -249,12 +255,27 @@ async function initiateUnlock() {
         passwordMessage.innerHTML = '<div class="error-message">Có lỗi xảy ra khi hiển thị media!</div>';
         passwordInput.disabled = false;
         progressContainer.style.display = 'none';
+        isPendingUnlock = false; // Reset trạng thái
     }
 }
 
+// === SỬA HÀM INITIATE UNLOCK ===
+async function initiateUnlock() {
+    if (isDecryptionComplete) {
+        // Đã giải mã xong, thực hiện unlock ngay
+        if (!preloadedData) {
+            passwordMessage.innerHTML = '<div class="error-message">Dữ liệu chưa sẵn sàng!</div>';
+            return;
+        }
+        await executeUnlock(preloadedData);
+    } else {
+        // Chưa giải mã xong, đánh dấu chờ
+        isPendingUnlock = true;
+        passwordMessage.innerHTML = '<div class="loading-message">Access Granted - Waiting for decryption...</div>';
+    }
+}
 
 // === LOGIC KÉO THẢ MỚI VỚI GSAP ===
-// === LOGIC KÉO THẢ MỚI VỚI GSAP (ĐÃ SỬA LỖI) ===
 function setupDragAndDropUnlock() {
     Draggable.create(unlockBtn, {
         type: "x,y", // Cho phép kéo theo cả 2 trục
@@ -265,10 +286,8 @@ function setupDragAndDropUnlock() {
             // hitTest kiểm tra xem 2 đối tượng có va chạm không
             if (this.hitTest(unlockTarget, "50%")) { // "50%" nghĩa là cần >50% diện tích va chạm
                 unlockBtn.classList.add("active");
-                // Không thay đổi unlockTarget
             } else {
                 unlockBtn.classList.remove("active");
-                // Không thay đổi unlockTarget
             }
         },
 
@@ -310,12 +329,10 @@ function setupDragAndDropUnlock() {
                     duration: 0.3
                 });
                 unlockBtn.classList.remove("active");
-                // Không thay đổi unlockTarget
             }
         }
     });
 }
-
 
 // === CÁC HÀM CŨ CHO GALLERY VÀ MODAL (Không thay đổi) ===
 function updateNavigationIndicator() {
@@ -471,15 +488,11 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// Preload khi trang load
+// === SỬA PHẦN PRELOAD KHI TRANG LOAD ===
 window.addEventListener('load', async () => {
     passwordInput.focus();
     try {
         preloadedData = await preloadAndDecryptMedia();
-        // === KÍCH HOẠT TÍNH NĂNG KÉO THẢ SAU KHI DỮ LIỆU ĐÃ SẴN SÀNG ===
-        if (preloadedData && preloadedData.successCount > 0) {
-            setupDragAndDropUnlock();
-        }
     } catch (error) {
         console.error('Lỗi preload:', error);
         passwordMessage.innerHTML = '<div class="error-message">Lỗi tải dữ liệu!</div>';
