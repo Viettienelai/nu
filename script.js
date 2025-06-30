@@ -1,5 +1,5 @@
 // ==================== CẤU HÌNH TÙY CHỈNH ====================
-const MAX_FILE_NUMBER = 20; // Thay đổi số này để tùy chỉnh số lượng file tối đa cần tải
+const MAX_FILE_NUMBER = 21; // Thay đổi số này để tùy chỉnh số lượng file tối đa cần tải
 // ============================================================
 
 // Elements
@@ -139,7 +139,7 @@ async function preloadAndDecryptMedia() {
         const extensions = ['avif.enc', 'mp4.enc', 'webp.enc', 'jpg.enc', 'png.enc', 'webm.enc'];
         const filePromise = (async () => {
             for (const ext of extensions) {
-                const filename = `assets/img/n${i}.${ext}`;
+                const filename = `assets/n${i}.${ext}`;
                 try {
                     const response = await fetch(filename);
                     if (!response.ok) continue;
