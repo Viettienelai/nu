@@ -1,5 +1,5 @@
 // ==================== CẤU HÌNH TÙY CHỈNH ====================
-const MAX_FILE_NUMBER = 8; // Thay đổi số này để tùy chỉnh số lượng file tối đa cần tải
+const MAX_FILE_NUMBER = 20; // Thay đổi số này để tùy chỉnh số lượng file tối đa cần tải
 // ============================================================
 
 // Elements
@@ -33,15 +33,19 @@ let preloadedData = null; // Lưu trữ data đã được giải mã
 const layoutConfig = {
     1: {
         date: "20 Tháng 5, 2025",
-        items: [1, 2, 3, null, null]
+        items: [1, 2, 3]
     },
     2: {
         date: "26 Tháng 5, 2025",
-        items: [4, 5, 6, 7, null]
+        items: [4, 5, 6, 7]
     },
     3: {
         date: "3 Tháng 6, 2025",
-        items: [8, null, null, null, null]
+        items: [8]
+    },
+    4: {
+        date: "29 Tháng 6, 2025",
+        items: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
     }
 };
 
